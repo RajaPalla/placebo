@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{sub}}, {{root}}</title>
+</head>
+<body>
+<h2>{{sub}}, {{root}}</h2>
+<table>
+    <tr>
+        <th>Names</th>
+    </tr>
+    {% for subSub in subSubs %}
+    <tr>
+        <td>{{subSub}}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
