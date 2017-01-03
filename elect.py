@@ -8,65 +8,65 @@ db_path = os.path.join(APP_DIR, "election.db")
 
 app = Flask(__name__)
 
-def getConstituencies(state):
+def getSub(root):
     db = sqlite3.connect(db_path)
     cursor = db.cursor()
-    cursor.execute("select name from data where type = 'ST' and keyy='{0}'".format(state))
-    stateIn = cursor.fetchone()[0]
-    getAcsQuery = "select name from data where type = 'AC' and parent = '{0}'".format(state)
+    cursor.execute("select name from data where type = 'ROOT' and key='{0}'".format(root))
+    rootIn = cursor.fetchone()[0]
+    getAcsQuery = "select name from data where type = 'SUB' and parent = '{0}'".format(root)
     cursor.execute(getAcsQuery)
-    listAssembly = []
+    subList = []
     for row in cursor:
-        listAssembly.append(row[0])
-    dictAssembly = {"listAssembly":listAssembly, "stateIn":stateIn}
-    return dictAssembly
+        subList.append(row[0])
+    dictSub = {"subList":subList, "rootIn":rootIn}
+    return dictSub
 
-def getBooths(state, constituency):
+def getSubSub(root, sub):
     db = sqlite3.connect(db_path)
     cursur = db.cursor()
-    cursur.execute("select name from data where type = 'ST' and keyy='{0}'".format(state))
-    stateIn = cursur.fetchone()[0]
-    boothParent = state+"/"+constituency
-    cursur.execute("select name from data where type = 'AC' and keyy='{0}'".format(boothParent))
-    constituencyIn = cursur.fetchone()[0]
-    getBoothsQuery = "select name from data where type = 'PB' and parent = '{0}'".format(boothParent)
-    cursur.execute(getBoothsQuery)
-    listBooths = []
+    cursur.execute("select name from data where type = 'ROOT' and key='{0}'".format(root))
+    rootIn = cursur.fetchone()[0]
+    subSubParent = root+"/"+sub
+    cursur.execute("select name from data where type = 'SUB' and key='{0}'".format(subSubParent))
+    subIn = cursur.fetchone()[0]
+    getSubSubQuery = "select name from data where type = 'SUBSUB' and parent = '{0}'".format(subSubParent)
+    cursur.execute(getSubSubQuery)
+    listSubSub = []
     for row in cursur:
-        listBooths.append(row[0])
-    dictBooths = {"listBooths":listBooths, "stateIn":stateIn, "constituencyIn":constituencyIn}
-    return dictBooths
+        listSubSub.append(row[0])
+    dictSubSub = {"listSubSub":listSubSub, "rootIn":rootIn, "subIn":subIn}
+    return dictSubSub
 
 @app.route('/')
-def states():
+def home():
     db = sqlite3.connect(db_path)
-    getStatesQuery = "select DISTINCT name from data where type='ST'"
+    getRootQuery = "select DISTINCT name from data where type='ROOT'"
     cursr = db.cursor()
-    cursr.execute(getStatesQuery)
-    listStates = []
+    cursr.execute(getRootQuery)
+    listRoot = []
     for row in cursr:
-        listStates.append(row[0])
-    return render_template('states.html', states=listStates)
+        listRoot.append(row[0])
+    return render_template('roots.html', roots=listRoot)
 
-@app.route('/<state>')
-def constituencies(state):
-    dictAssembly = getConstituencies(state)
-    return render_template('constituencies.html', constituencies = dictAssembly['listAssembly'], State = dictAssembly['stateIn'])
+@app.route('/<root>')
+def sub(root):
+    dictSub = getSub(root)
+    return render_template('sub.html', subs = dictSub['subList'], root = dictSub['rootIn'])
 
-@app.route('/<state>.json')
-def constituenciesJson(state):
-    dictAssembly = getConstituencies(state)
-    return json.dumps(dictAssembly['listAssembly'])
+@app.route('/<root>.json')
+def subJson(root):
+    dictSub = getSub(root)
+    return json.dumps(dictSub['subList'])
 
-@app.route('/<state>/<constituency>')
-def booths(state, constituency):
-    dictBooths = getBooths(state, constituency)
-    return render_template('booths.html', booths = dictBooths['listBooths'], State = dictBooths['stateIn'], Constituency = dictBooths['constituencyIn'])
+@app.route('/<root>/<sub>')
+def subSub(root, sub):
+    dictSubSub = getSubSub(root, sub)
+    return render_template('subSub.html', subSubs = dictSubSub['listSubSub'], root = dictSubSub['rootIn'], sub = dictSubSub['subIn'])
 
-@app.route('/<state>/<constituency>.json')
-def boothsJson(state, constituency):
-    dictBooths = getBooths(state, constituency)
-    return json.dumps(dictBooths['listBooths'])
+@app.route('/<root>/<sub>.json')
+def subSubJson(root, sub):
+    dictSubSub = getSubSub(root, sub)
+    return json.dumps(dictSubSub['listSubSub'])
 
 if __name__ == '__main__':
     app.run(debug=True)
