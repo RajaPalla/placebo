@@ -1,0 +1,1 @@
+CREATE TABLE data ('key' TEXT, 'parent' TEXT, 'type' TEXT, 'name' TEXT);
