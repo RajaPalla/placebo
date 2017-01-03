@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>States in India</title>
+    <title>{{root}}</title>
 </head>
 <body>
+<h2>{{root}}</h2>
 <table>
     <tr>
-        <th>State</th>
+        <th>Names</th>
     </tr>
-    {% for state in states %}
+    {% for sub in subs %}
     <tr>
-        <td>{{state}}</td>
+        <td>{{sub}}</td>
     </tr>
     {% endfor %}
 </table>
